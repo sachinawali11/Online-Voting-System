@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Voting System - Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #eef2f5; margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .stats { display: flex; justify-content: space-around; background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center; margin: 15px 0; }
+        .stat-box h2 { margin: 0; color: #007bff; }
+        .item-list { list-style: none; padding: 0; }
+        .item-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        input { width: 100%; padding: 8px; margin: 6px 0 12px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-success { background: #28a745; padding: 5px 10px; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; margin-right: 5px; }
+        .btn-danger { background: #dc3545; padding: 5px 10px; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; font-weight: bold; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .alert-success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h2>Admin Control Panel</h2>
+                <a href="/logout" style="color:#dc3545; text-decoration:none; font-weight:bold;">Logout</a>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="stats">
+                <div class="stat-box">
+                    <h2>{{ total_voters }}</h2>
+                    <small>Approved Voters</small>
+                </div>
+                <div class="stat-box">
+                    <h2>{{ voted_count }}</h2>
+                    <small>Votes Cast</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Voter Approval Section -->
+        <div class="card" style="border-left: 4px solid #ffc107;">
+            <h3>Pending Voter Requests ({{ pending_voters|length }})</h3>
+            {% if pending_voters %}
+                <ul class="item-list">
+                    {% for voter in pending_voters %}
+                        <li>
+                            <span><strong>{{ voter.username }}</strong></span>
+                            <div>
+                                <a href="/admin/approve_voter/{{ voter.id }}" class="btn-success">Approve</a>
+                                <a href="/admin/reject_voter/{{ voter.id }}" class="btn-danger" onclick="return confirm('Reject registration?')">Reject</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: #666; font-size: 14px;">No pending registration requests.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>Candidate Tally & Management</h3>
+            <ul class="item-list">
+                {% for candidate in candidates %}
+                    <li>
+                        <span><strong>{{ candidate.name }}</strong> ({{ candidate.position }}) — <strong>{{ candidate.votes }} votes</strong></span>
+                        <a href="/admin/delete_candidate/{{ candidate.id }}" class="btn-danger" onclick="return confirm('Delete candidate?')">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <h4 style="margin-top: 20px;">Add New Candidate</h4>
+            <form action="/admin/add_candidate" method="POST">
+                <input type="text" name="name" placeholder="Candidate Name" required>
+                <input type="text" name="position" placeholder="Position / Category" required>
+                <button type="submit">Add Candidate</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Manually Register & Approve Voter</h3>
+            <form action="/admin/add_voter" method="POST">
+                <input type="text" name="username" placeholder="Voter ID / Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" style="background:#28a745;">Add Approved Voter</button>
+            </form>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #dc3545;">
+            <h3>Danger Zone</h3>
+            <p style="font-size: 13px; color: #666;">Resetting clears all vote counts and allows registered voters to vote again.</p>
+            <a href="/admin/reset_election" style="display:block; text-align:center; background:#dc3545; color:white; padding:10px; border-radius:4px; text-decoration:none; font-weight:bold;" onclick="return confirm('Reset all election votes?')">Reset All Votes</a>
+        </div>
+    </div>
+</body>
+</html>

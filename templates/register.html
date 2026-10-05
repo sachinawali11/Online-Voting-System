@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Voting System - Register</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #eef2f5; margin: 0; padding: 20px; }
+        .card { max-width: 400px; margin: 40px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .nav-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .nav-tabs a { flex: 1; text-align: center; padding: 10px; text-decoration: none; font-weight: bold; color: #666; }
+        .nav-tabs a.active { color: #28a745; border-bottom: 3px solid #28a745; }
+        label { display: block; margin-top: 12px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; font-weight: bold; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .info-note { margin-top: 15px; font-size: 13px; color: #666; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Online Voting System</h2>
+
+        <div class="nav-tabs">
+            <a href="/login">Login</a>
+            <a href="/register" class="active">Register New Voter</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/register" method="POST">
+            <label>Choose Voter ID / Username:</label>
+            <input type="text" name="username" required>
+
+            <label>Choose Password:</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">Submit Registration</button>
+        </form>
+
+        <p class="info-note">Registration requests require approval from the admin before you can log in.</p>
+    </div>
+</body>
+</html>
